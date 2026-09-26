@@ -35,11 +35,9 @@ jobs:
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install frontend dependencies
-        working-directory: ./GhostClient
         run: npm install
 
       - name: Build Ghost Launcher
-        working-directory: ./GhostClient
         run: npm run build
 
       - name: Upload artifacts (Windows)
@@ -47,18 +45,18 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ghost-launcher-windows
-          path: GhostClient/apps/app/src-tauri/target/release/bundle/
+          path: apps/app/src-tauri/target/release/bundle/
 
       - name: Upload artifacts (macOS)
         if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: ghost-launcher-macos
-          path: GhostClient/apps/app/src-tauri/target/release/bundle/
+          path: apps/app/src-tauri/target/release/bundle/
 
       - name: Upload artifacts (Linux)
         if: matrix.platform == 'ubuntu-22.04'
         uses: actions/upload-artifact@v4
         with:
           name: ghost-launcher-linux
-          path: GhostClient/apps/app/src-tauri/target/release/bundle/
+          path: apps/app/src-tauri/target/release/bundle/
