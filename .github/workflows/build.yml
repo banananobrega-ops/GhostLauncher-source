@@ -20,6 +20,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Fix gradlew permissions
+        run: chmod +x packages/app-lib/java/gradlew
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
