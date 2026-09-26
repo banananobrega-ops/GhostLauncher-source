@@ -55,18 +55,18 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ghost-launcher-windows
-          path: apps/app/src-tauri/target/release/bundle/
+          path: target/release/bundle/
 
       - name: Upload artifacts (macOS)
         if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: ghost-launcher-macos
-          path: apps/app/src-tauri/target/release/bundle/
+          path: target/release/bundle/
 
       - name: Upload artifacts (Linux)
         if: matrix.platform == 'ubuntu-24.04'
         uses: actions/upload-artifact@v4
         with:
           name: ghost-launcher-linux
-          path: apps/app/src-tauri/target/release/bundle/
+          path: target/release/bundle/
