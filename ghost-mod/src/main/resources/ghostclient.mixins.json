@@ -1,0 +1,20 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "app.ghostclient.mod.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "AbstractClientPlayerEntityMixin",
+    "EntityDisplayNameMixin",
+    "EntityRendererNameMixin",
+    "GameMenuScreenMixin",
+    "InGameHudMixin",
+    "MinecraftClientKeyMixin",
+    "PlayerEntityDisplayNameMixin",
+    "PlayerListHudMixin",
+    "ScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

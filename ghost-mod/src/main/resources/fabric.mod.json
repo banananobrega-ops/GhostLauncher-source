@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "ghostclient",
+  "version": "${version}",
+  "name": "Ghost Launcher",
+  "description": "Mostra a tua capa do Ghost Launcher em qualquer server e poe a logo do Ghost ao lado do nome de quem usa o client.",
+  "authors": ["Ghost Launcher"],
+  "license": "GPL-3.0-only",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["app.ghostclient.mod.GhostClientMod"]
+  },
+  "mixins": ["ghostclient.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "1.21.11",
+    "java": ">=21"
+  }
+}

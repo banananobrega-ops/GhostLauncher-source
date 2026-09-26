@@ -1,0 +1,83 @@
+name: Ghost Launcher Release
+
+# Push a tag like v1.0.0 (or run manually) to build Windows, macOS and Linux at the same time.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            args: ''
+          - runner: windows-2025
+            args: ''
+          - runner: macos-15
+            args: --target universal-apple-darwin
+    runs-on: ${{ matrix.runner }}
+    env:
+      SQLX_OFFLINE: true
+      GHOST_DISCORD_CLIENT_ID: ${{ vars.GHOST_DISCORD_CLIENT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Fetch third-party sources if missing
+        shell: bash
+        run: |
+          [ -f third-party/blockbench/package.json ] || { rm -rf third-party/blockbench; git clone --depth 1 https://github.com/Ghost-Launcher/blockbench-skin-standalone.git third-party/blockbench; }
+          [ -f apps/app/vendor/cubiomes/finders.c ] || { rm -rf apps/app/vendor/cubiomes; git clone --depth 1 https://github.com/Cubitect/cubiomes.git apps/app/vendor/cubiomes; }
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      - run: pnpm install --frozen-lockfile
+      - run: npm ci
+        working-directory: third-party/blockbench
+
+      - name: Build and upload
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_BUNDLER_DMG_IGNORE_CI: ${{ runner.os == 'macOS' && 'true' || '' }}
+        with:
+          projectPath: apps/app
+          tauriScript: pnpm tauri
+          args: ${{ matrix.args }} --config tauri-release.conf.json
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || format('build-{0}', github.run_number) }}
+          releaseName: Ghost Launcher ${{ github.ref_name }}
+          releaseDraft: false
+          prerelease: false
+
+  mod:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '9.2.1' }
+      - run: gradle build --no-daemon
+        working-directory: ghost-mod
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ghostclient-mod
+          path: ghost-mod/build/libs/*.jar
