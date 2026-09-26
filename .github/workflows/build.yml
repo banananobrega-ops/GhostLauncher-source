@@ -12,15 +12,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-22.04, windows-latest]
+        platform: [macos-latest, ubuntu-24.04, windows-latest]
 
     runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Fix gradlew permissions
+      - name: Fix gradlew permissions (Unix only)
+        if: matrix.platform != 'windows-latest'
         run: chmod +x packages/app-lib/java/gradlew
 
       - name: Install pnpm
@@ -36,10 +39,10 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install dependencies (Ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
+        if: matrix.platform == 'ubuntu-24.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install frontend dependencies
         run: pnpm install
@@ -62,7 +65,7 @@ jobs:
           path: apps/app/src-tauri/target/release/bundle/
 
       - name: Upload artifacts (Linux)
-        if: matrix.platform == 'ubuntu-22.04'
+        if: matrix.platform == 'ubuntu-24.04'
         uses: actions/upload-artifact@v4
         with:
           name: ghost-launcher-linux
