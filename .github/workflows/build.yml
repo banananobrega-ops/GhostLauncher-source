@@ -22,13 +22,11 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'pnpm'
 
       - name: Install Rust stable
@@ -44,7 +42,7 @@ jobs:
         run: pnpm install
 
       - name: Build Ghost Launcher
-        run: pnpm run build
+        run: pnpm run app:build
 
       - name: Upload artifacts (Windows)
         if: matrix.platform == 'windows-latest'
